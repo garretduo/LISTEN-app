@@ -1,0 +1,56 @@
+# LISTEN settings: seeds, split ratios, paths, and the Learned Hands file list.
+# Seeds and split ratios feed every reported result. Changing them after results
+# exist breaks comparability, so log the change in docs/decisions.md first.
+
+# One entry per repeat of the 80/10/10 split. Frozen: the splits for these seeds are
+# committed in results/splits/ (docs/decisions.md, "seeds 0 to 4 are frozen"). Editing
+# this list means regenerating the frozen splits and logging the change there.
+seeds: [0, 1, 2, 3, 4]
+
+# Story-level iterative stratification. Must sum to 1.
+splits:
+  train: 0.8
+  val: 0.1
+  test: 0.1
+
+evaluation:
+  # Macro-F1 and micro-F1 average every category except these four, which have fewer than
+  # 10 positive stories in the best-guess file (docs/decisions.md, "headline metrics use
+  # 16 categories"). Fixed so every model, seed and part is scored on the same set.
+  # Review the list if data.default_set changes.
+  excluded_categories:
+    - Disaster Relief
+    - Environmental Justice
+    - Native American Issues and Tribal Law
+    - Veterans & Military
+
+# Relative to the repo root. data/ and artifacts/ are gitignored.
+paths:
+  data_dir: data
+  artifacts_dir: artifacts
+  results_dir: results
+  # Frozen train/val/test assignments (small CSV + JSON, committed to git). Written by
+  # scripts/make_splits.py, read by listen.data.get_split. See docs/decisions.md.
+  splits_dir: results/splits
+
+data:
+  # The data page links these files relatively; this is that page's folder.
+  base_url: https://learned-hands.github.io/project-hub/texts/
+  # Which entry of `files` the models train on by default.
+  default_set: best_guess_binary
+  id_column: _id
+  text_column: full_text
+  # key -> remote and local filename, plus the row count expected after download.
+  files:
+    best_guess_binary:
+      name: 2019-04-23_best-guess_binary.csv
+      rows: 3459
+    best_guess_continuous:
+      name: 2019-04-23_best-guess_continuous.csv
+      rows: 3459
+    confidence95_binary:
+      name: 2019-04-23_95p-confidence_binary.csv
+      rows: 1506
+    confidence95_continuous:
+      name: 2019-04-23_95p-confidence_continuous.csv
+      rows: 1506
